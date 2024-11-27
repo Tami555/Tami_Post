@@ -1,50 +1,40 @@
+# Эспрессо (программа для отображения информации о кофе из базы данных)
 import sys
-import random
-from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton
-from PyQt6.QtGui import QPainter, QColor, QBrush
+from PyQt6 import uic
+from PyQt6.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem
+import sqlite3
 
 
-class MyWidget(QMainWindow):
+class Coffee(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setGeometry(0, 0, 524, 550)
+        uic.loadUi('UI.ui', self)
+        self.create_database()
 
-        self.btn = QPushButton('клик', self)
-        self.btn.setGeometry(170, 430, 211, 41)
-        self.btn.clicked.connect(self.update)
+    def create_database(self):
+        self.database = sqlite3.connect('coffee.sqlite').cursor()
+        result = self.database.execute("""
+        SELECT * FROM coffee
+        """).fetchall()
 
-        self.painter = QPainter(self)
-        self.way = False
+        titles = ["ID", 'название сорта', 'степень обжарки',
+                  'молотый/в зернах', 'описание вкуса', 'цена', 'объем упаковки']
+        self.tableWidget.setColumnCount(len(titles))
+        self.tableWidget.setHorizontalHeaderLabels(titles)
+        self.tableWidget.setRowCount(0)
+        self.tableWidget.setColumnWidth(0, 50)
+        self.tableWidget.setColumnWidth(2, 150)
+        self.tableWidget.setColumnWidth(3, 150)
 
-    def update(self):
-        self.way = True
-        self.repaint()
-
-    @staticmethod
-    def random_color():
-        color_lst = []
-        for x in range(3):
-            color_lst.append(random.randint(0, 255))
-        return QColor(*color_lst)
-
-    def paintEvent(self, event):
-        if self.way:
-            self.painter.begin(self)
-            coords = (0, 0)
-            for x in range(5):
-                side = random.randint(20, 140)
-                self.painter.setBrush(QBrush(self.random_color(), Qt.BrushStyle.Dense1Pattern))
-                self.painter.drawEllipse(*coords, side, side)
-                x = random.randint(20, 250)
-                y = random.randint(20, 250)
-                coords = (coords[0] + x, coords[0] + y)
-            self.painter.end()
+        for i, x in enumerate(result):
+            self.tableWidget.setRowCount(self.tableWidget.rowCount() + 1)
+            for e, y in enumerate(x):
+                self.tableWidget.setItem(i, e, QTableWidgetItem(str(y)))
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    win = MyWidget()
+    win = Coffee()
     win.show()
     sys.exit(app.exec())
 
