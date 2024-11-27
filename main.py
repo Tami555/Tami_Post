@@ -8,7 +8,7 @@ import sqlite3
 class Coffee(QMainWindow):
     def __init__(self):
         super().__init__()
-        uic.loadUi('UI.ui', self)
+        uic.loadUi('main.ui', self)
         self.create_database()
 
     def create_database(self):
