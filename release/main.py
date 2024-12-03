@@ -1,14 +1,17 @@
-# Эспрессо (программа для отображения информации о кофе из базы данных)
+# Латте макиато (программа для отображения информации о кофе из базы данных)
 import sys
-from PyQt6 import uic
+# from PyQt6 import uic
 from PyQt6.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QPushButton, QPlainTextEdit
 import sqlite3
+from main_ui import Ui_MainWindow
+from addEditCoffeeForm import Ui_AddWidget
 
 
-class AddWidget(QMainWindow):
+class AddWidget(QMainWindow, Ui_AddWidget):
     def __init__(self, parent):
         super().__init__()
-        uic.loadUi('addEditCoffeeForm.ui', self)
+        # uic.loadUi('addEditCoffeeForm.ui', self)
+        Ui_AddWidget.setupUi(self, self)
         self.parent = parent
         self.sender = ''
 
@@ -66,11 +69,13 @@ class AddWidget(QMainWindow):
             self.close()
 
 
-class Coffee(QMainWindow):
+class Coffee(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
-        uic.loadUi('main.ui', self)
-        self.database = sqlite3.connect('coffee.sqlite')
+        # uic.loadUi('main.ui', self)
+        Ui_MainWindow.setupUi(self, self)
+
+        self.database = sqlite3.connect('data/coffee.sqlite')
         self.cur = self.database.cursor()
         self.full_table()
 
